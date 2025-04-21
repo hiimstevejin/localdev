@@ -1,0 +1,44 @@
+version: '3.3'
+
+services:
+  db:
+    build:
+      dockerfile: ./db/Dockerfile
+    container_name: 'db_practice'
+    restart: on-failure
+    ports:
+      - 15432:5432
+    environment:
+      POSTGRES_USER: localuser
+      POSTGRES_PASSWORD: cs4640LocalUser!
+      POSTGRES_DB: example
+      TZ: "America/New_York"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+  php:
+    build:
+      context: ./web/
+      dockerfile: ./Dockerfile
+    container_name: 'web_practice'
+    ports:
+      - 8080:80
+    volumes:
+      - ./web/src/:/opt/src/
+      - ./web/www/Swipeify/:/var/www/html/
+      - ./web/cgi-bin/:/usr/lib/cgi-bin/
+      - ./web/log/:/opt/log/
+    depends_on:
+      - db
+    environment:
+      TZ: "America/New_York"
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "8081:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - db
+volumes:
+  db-data:

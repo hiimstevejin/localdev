@@ -1,0 +1,197 @@
+@image-size: 200px;
+
+.rounded-shadow {
+  border-radius: 10%;
+  box-shadow: 12px 12px 4px rgba(0, 0, 0, 0.5);
+}
+
+body {
+  background-image: linear-gradient(to bottom right, #df6815, #181818);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+main {
+  margin-top: 100px;
+}
+
+section {
+  margin: 50px;
+}
+
+h1 {
+  text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
+  font-size: 50px;
+  font-weight: 800;
+  color: white;
+}
+
+h2 {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-size: 40px;
+  font-weight: 500;
+  color: white;
+}
+
+h5 {
+  color: white;
+}
+
+.navbar-nav {
+  margin-right: 50px;
+}
+
+.navbar-nav li {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.btn {
+  box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hero-slogan {
+  flex-grow: 1;
+  margin: 50px;
+}
+
+.hero-slogan button {
+  margin-top: 20px;
+}
+
+.hero-images {
+  flex-grow: 1;
+}
+
+.hero-images img {
+  height: @image-size;
+}
+
+#image1 {
+  .rounded-shadow;
+  rotate: -15deg;
+  margin-top: 65px;
+}
+
+#image2 {
+  .rounded-shadow;
+  margin-left: -50px;
+  rotate: -5deg;
+  margin-top: 10px;
+}
+
+#image3 {
+  .rounded-shadow;
+  margin-left: -50px;
+  rotate: 0deg;
+  margin-top: -10px;
+}
+
+#image4 {
+  .rounded-shadow;
+  margin-left: -50px;
+  rotate: 5deg;
+  margin-top: 10px;
+}
+
+#image5 {
+  .rounded-shadow;
+  margin-left: -50px;
+  rotate: 15deg;
+  margin-top: 65px;
+}
+
+.how-it-works-section {
+  margin: 100px;
+}
+
+.card {
+  background-color: #f1bd81;
+  box-shadow: 12px 12px 4px rgba(0, 0, 0, 0.5);
+  border-radius: 20px;
+}
+
+.card img {
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+.drop-down-section {
+  margin: 100px;
+
+  button {
+    background-color: #f1bd80;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.5);
+    margin-top: 10px;
+  }
+
+  button:hover {
+    cursor: pointer;
+  }
+}
+
+.drop-down-section .accordion-body {
+  color: white;
+}
+
+@media screen and (max-width: 990px) {
+  .hero {
+    display: block;
+  }
+
+  .hero-images {
+    text-align: center;
+  }
+
+  .hero-images img {
+    height: 180px;
+  }
+}
+
+@media screen and (max-width: 840px) {
+  .hero-images img {
+    height: 150px;
+  }
+}
+
+@media screen and (max-width: 680px) {
+  h1{
+    font-size: 30px;
+   } 
+   h2{
+    font-size:20px;
+   }
+
+  .hero-images img {
+    height: 100px;
+  }
+
+  .card-deck{
+    display:block;
+  }
+
+
+}
+
+@media screen and (max-width: 680px) {
+  h1{
+    font-size: 30px;
+   } 
+   h2{
+    font-size:20px;
+   }
+
+  .hero-images img {
+    height: 80px;
+  }
+}
