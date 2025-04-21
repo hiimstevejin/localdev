@@ -59,7 +59,7 @@
           <p class="btn-top-p" style="font-size: 40px; font-weight: 800; margin-bottom: 0px;">Library</p>
           <p class="btn-bottom-p" style="font-size: 12px; margin-bottom: 5px;">Swipe from your library</p>
         </a><br>
-        <a class="btn btn-warning" href="./search.php" style="border-radius: 20px; margin-top: 20px;">
+        <a class="btn btn-warning" href="index.php?command=search" style="border-radius: 20px; margin-top: 20px;">
           <p class="btn-top-p" style="font-size: 40px; font-weight: 800; margin-bottom: 0px;">Playlist/Album</p>
           <p class="btn-bottom-p" style="font-size: 12px; margin-bottom: 5px;">Swipe from other's playlists/albums</p>
         </a>

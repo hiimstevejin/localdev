@@ -34,6 +34,7 @@ class SwipeController {
     if (isset($this->input["command"]) && (
       $this->input["command"] == "login" || 
       $this->input["command"] == "showlogin" ||
+      $this->input["command"] == "callback" ||
       isset($_SESSION["name"])))
       $command = $this->input["command"];
 
@@ -46,6 +47,9 @@ class SwipeController {
         break;
       case "addsong":
         $this->addSong();
+        break;
+      case "callback":
+        $this->callback();
         break;
       case "home":
         $this->showHome();
@@ -118,7 +122,6 @@ class SwipeController {
   public function logout() {
     session_destroy();
     session_start();
-    setcookie("user_name", "", time() - 3600, "/");
   }
 
   public function addSong() {
@@ -187,15 +190,15 @@ class SwipeController {
     // include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/swipeLib.html");
   }
   public function showSearch($message = "") {
-    include("/opt/src/Swipeify/templates/swipeLib.html");
-    // include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/search.html");
+    include("/opt/src/Swipeify/templates/search.php");
+    // include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/search.php");
   }
 
   public function showHome($message = "") {
     $songs = $this->getSongs();
     include("/opt/src/Swipeify/templates/home.php");
     // include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/home.php");
-    echo json_encode($songs);
+    // echo json_encode($songs);
   }
 
   public function showLogin($message = "") {
@@ -206,5 +209,82 @@ class SwipeController {
   public function showWelcome($message = "") {
     include("/opt/src/Swipeify/templates/index.html");
     // include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/index.html");
+  }
+
+  public function callback($message = "") {
+    if (!isset($this->input['code'])) {
+      echo "Authorization code not found.";
+      return;
+    }
+  
+    $code = $this->input['code'];
+  
+    $client_id = Config::$spotify["clientid"];
+    $client_secret = Config::$spotify["clientsecret"];
+    $redirect_uri = 'http://127.0.0.1:8080/index.php?command=callback';
+  
+    $token_url = 'https://accounts.spotify.com/api/token';
+  
+    $post_fields = [
+      'grant_type' => 'authorization_code',
+      'code' => $code,
+      'redirect_uri' => $redirect_uri,
+      'client_id' => $client_id,
+      'client_secret' => $client_secret
+    ];
+  
+    $ch = curl_init();
+  
+    curl_setopt($ch, CURLOPT_URL, $token_url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_fields));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
+  
+    $response = curl_exec($ch);
+    curl_close($ch);
+  
+    $data = json_decode($response, true);
+  
+    if (isset($data['access_token'])) {
+      $_SESSION['spotify_access_token'] = $data['access_token'];
+      $_SESSION['spotify_refresh_token'] = $data['refresh_token'];
+      $_SESSION['spotify_token_expires'] = time() + $data['expires_in'];
+  
+      $this->fetchSpotifyUserProfile($data['access_token']);
+
+      header('Location: ?command=home');
+      return;
+    } else {
+      echo "Error retrieving access token:<br><pre>" . print_r($data, true) . "</pre>";
+    }
+  }
+
+  private function fetchSpotifyUserProfile($accessToken) {
+    $ch = curl_init('https://api.spotify.com/v1/me');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+      'Authorization: Bearer ' . $accessToken
+    ]);
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    $user = json_decode($response, true);
+    if (isset($user['display_name']) && isset($user['email'])) {
+      $_SESSION['name'] = $user['display_name'];
+      $_SESSION['curuserid'] = $user['id'];
+      $_SESSION['email'] = $user['email'];
+
+      $results = $this->db->query("select * from swipeify_users where email = $1;", $user['email']);
+
+      if (empty($results)) {
+        $result = $this->db->query("insert into swipeify_users (id, name, email) values ($1, $2, $3);",
+        $user['id'], $user['display_name'], $user['email']);
+      }
+
+      header("Location: ?command=home");
+      return;
+    }
   }
 }

@@ -1,3 +1,17 @@
+<?php
+include_once __DIR__ . '/../Config.php';
+$client_id = Config::$spotify["clientid"];
+$redirect_uri = 'http://127.0.0.1:8080/index.php?command=callback';
+$scope = 'user-read-private user-read-email';
+
+$authorize_url = 'https://accounts.spotify.com/authorize?'.http_build_query([
+    'response_type' => 'code',
+    'client_id' => $client_id,
+    'scope' => $scope,
+    'redirect_uri' => $redirect_uri
+]);
+?>
+
 <!-- sj3sj -->
 <!DOCTYPE html>
 <html lang="en">
@@ -21,8 +35,7 @@
     <div class="container">
       <form action="?command=login" method="post">
         <div class="mb-3">
-          <a href="https://accounts.spotify.com/authorize?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=YOUR_REDIRECT_URI&scope=user-read-private%20user-read-email
-          " class="btn btn-success">
+        <a href="<?php echo $authorize_url; ?>" class="btn btn-success">
             <img src="https://upload.wikimedia.org/wikipedia/commons/8/84/Spotify_icon.svg" alt="Spotify Logo" width="20" class="me-2">
             Log in with Spotify
           </a>
