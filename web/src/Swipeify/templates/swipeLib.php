@@ -31,6 +31,8 @@
       }
       .song-container img {
         max-width: 250px;
+        max-height: 250px;
+        object-fit: cover;
         border-radius: 12px;
       }
       .song-container {
