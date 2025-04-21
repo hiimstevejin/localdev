@@ -166,14 +166,15 @@ class SwipeController {
     $results = $this->db->query("SELECT 
         tracks.name AS song_name, 
         artists.name AS artist_name, 
-        albums.name AS album_name
+        albums.name AS album_name,
+        albums.image_url AS image_url
     FROM user_tracks
     JOIN tracks ON user_tracks.track_id = tracks.spotify_id
     JOIN album_tracks ON tracks.spotify_id = album_tracks.track_id
     JOIN albums ON album_tracks.album_id = albums.spotify_id
     JOIN artist_albums ON albums.spotify_id = artist_albums.album_id
     JOIN artists ON artist_albums.artist_id = artists.spotify_id
-    WHERE user_tracks.user_id = $1;", $_SESSION["curuserid"]);
+    WHERE user_tracks.user_id = $1;", $_SESSION["curuserid"]);  
     return $results;
   }
 
@@ -183,7 +184,7 @@ class SwipeController {
   }
 
   public function showSwipeLib($message = "") {
-    include("/opt/src/Swipeify/templates/swipeLib.html");
+    include("/opt/src/Swipeify/templates/swipeLib.php");
     // include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/swipeLib.html");
   }
   public function showSearch($message = "") {
