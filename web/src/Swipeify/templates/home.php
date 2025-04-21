@@ -45,7 +45,7 @@
             <li class="nav-item"><a class="nav-link" href="#">Services</a></li>
             <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
             <li class="nav-item"><a class="nav-link" href="index.php?command=logout">Log Out</a></li>
-            <li class="nav-item"><button class="btn" type="submit">Sync Library<img class="img-responsive center-block" src="images/refresh.png" alt="Refresh Icon" style="margin-left: 10px; height: 25px;"></button></li>
+            <li class="nav-item"><a class="btn btn-light" href="index.php?command=sync">Sync Library<img class="img-responsive center-block" src="images/refresh.png" alt="Refresh Icon" style="margin-left: 10px; height: 25px;"></a></li>
           </ul>
         </div>
       </nav>
@@ -85,37 +85,6 @@
               <?php endforeach; ?>
             </tbody>
           </table>
-      </section>
-
-      <section>
-        <form class="p-4 d-flex flex-column align-items-center" style="border: 2px solid black; text-align: center; width: 300px; margin: auto;" 
-              action="?command=addsong" method="post">
-        <h1>Add Song</h1>
-              
-          <div class="mb-3 w-100">
-            <label style="color: white;" for="songname" class="form-label">Song Name</label>
-            <input style="width: 100%;" type="text" class="form-control" id="songname" name="songname">
-          </div>
-
-          <div class="mb-3 w-100">
-            <label style="color: white;" for="songid" class="form-label">Spotify Song ID</label>
-            <input style="width: 100%;" type="text" class="form-control" id="songid" name="songid">
-          </div>
-
-          <div class="mb-3 w-100">
-            <label style="color: white;" for="artist" class="form-label">Artist</label>
-            <input style="width: 100%;" type="text" class="form-control" id="artist" name="artist">
-          </div>
-
-          <div class="mb-3 w-100">
-            <label style="color: white;" for="album" class="form-label">Album</label>
-            <input style="width: 100%;" type="text" class="form-control" id="album" name="album">
-          </div>
-
-          <div>
-            <button type="submit" class="btn btn-success">Submit</button>
-          </div>
-        </form>
       </section>
 
       <!--

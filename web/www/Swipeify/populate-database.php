@@ -45,13 +45,16 @@
             email       text);");
     $res  = pg_query($dbHandle, "create table artist_albums (
             artist_id   text,
-            album_id    text);");
+            album_id    text,
+            PRIMARY KEY (artist_id, album_id));");
     $res  = pg_query($dbHandle, "create table album_tracks (
             album_id    text,
-            track_id    text);");
+            track_id    text,
+            PRIMARY KEY (album_id, track_id));");
     $res  = pg_query($dbHandle, "create table user_tracks (
             user_id     text,
-            track_id    text);");
+            track_id    text,
+            PRIMARY KEY (user_id, track_id));");
 
 
     // Prepare a statement, then execute it repeatedly

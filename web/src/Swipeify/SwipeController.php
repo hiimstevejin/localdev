@@ -42,12 +42,8 @@ class SwipeController {
       case "showlogin":
         $this->showLogin();
         break;
-      case "login":
-        $this->login();
-        break;
-      case "addsong":
-        $this->addSong();
-        break;
+      case "sync":
+        $this->fetchSpotifySongs($_SESSION['spotify_access_token'], $_SESSION['curuserid']);
       case "callback":
         $this->callback();
         break;
@@ -69,50 +65,6 @@ class SwipeController {
     }
   }
 
-  public function login() {
-    if (isset($_POST["fullname"]) && isset($_POST["email"]) &&
-      isset($_POST["password"]) && !empty($_POST["password"]) &&
-      !empty($_POST["fullname"]) && !empty($_POST["email"])) {
-
-      $results = $this->db->query("select * from swipeify_users where email = $1;", $_POST["email"]);
-
-      if (empty($results)) {
-        // create the user account
-        $result = $this->db->query("insert into swipeify_users (name, email, password) values ($1, $2, $3);",
-        $_POST["fullname"], $_POST["email"], 
-        password_hash($_POST["password"], PASSWORD_DEFAULT));
-        
-        $_SESSION["name"] = $_POST["fullname"];
-        $_SESSION["email"] = $_POST["email"];
-        
-        // https://www.w3schools.com/php/php_cookies.asp
-        setcookie("user_name", $_SESSION["name"], time() + (86400 * 30), "/");
-
-        header("Location: ?command=home");
-        return;
-      } else {
-        $hashed_password = $results[0]["password"];
-        $correct = password_verify($_POST["password"], $hashed_password);
-        if ($correct) {
-          $_SESSION["name"] = $_POST["fullname"];
-          $_SESSION["email"] = $_POST["email"];
-
-          setcookie("user_name", $_SESSION["name"], time() + (86400 * 30), "/");
-
-          header("Location: ?command=home");
-          return;
-        } else {
-         $message = "<p class='alert alert-danger'>Incorrect password!</p>"; 
-        }
-      }
-      $this->showLogin($message);
-      return;
-    }
-
-    header("Location: ?command=showlogin");
-    $this->showLogin("Name or email missing");
-  }
-
   /**
    * Logout function.  We **need** to clear the session somehow.
    * When the user wants to start over, we should allow them to
@@ -122,26 +74,6 @@ class SwipeController {
   public function logout() {
     session_destroy();
     session_start();
-  }
-
-  public function addSong() {
-    if (isset($_POST["songname"]) && isset($_POST["songid"]) && isset($_POST["artist"]) && isset($_POST["album"])) {
-      $songid = trim($_POST["songid"]);
-      if (preg_match('/^[a-zA-Z0-9]+$/', $songid) && isset($_POST["songid"])) {
-        $this->db->query("INSERT INTO tracks (spotify_id, name) VALUES ($1, $2)", $_POST["songid"], $_POST["songname"]);
-        $result = $this->db->query("select id from swipeify_users where email = $1 LIMIT 1;", $_SESSION["email"]);
-        if ($result) {
-          $_SESSION["curuserid"] = $result[0]["id"];
-        }
-        $this->db->query("INSERT INTO user_tracks (user_id, track_id) VALUES ($1, $2)", $_SESSION["curuserid"], $_POST["songid"]);
-        echo "Your Song Has Been Added!"; 
-      } else {
-        echo "Invalid Characters!";
-      }
-    } else {
-      $message = "<p class='alert alert-danger'>Missing value!</p>"; 
-    }
-    $this->showHome(message: $message);
   }
 
   public function showSongDetail() {
@@ -281,10 +213,69 @@ class SwipeController {
       if (empty($results)) {
         $result = $this->db->query("insert into swipeify_users (id, name, email) values ($1, $2, $3);",
         $user['id'], $user['display_name'], $user['email']);
+
+        $this->fetchSpotifySongs($_SESSION['spotify_access_token'], $user['id']);
       }
 
       header("Location: ?command=home");
       return;
     }
   }
+
+  private function fetchSpotifySongs($accessToken, $userId) {
+    $offset = 0;
+    $hasMore = true;
+
+    while ($hasMore) {
+      $url = "https://api.spotify.com/v1/me/tracks?limit=50&offset=$offset";
+  
+      $ch = curl_init($url);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer ' . $accessToken
+      ]);
+
+      $response = curl_exec($ch);
+
+      $data = json_decode($response, true);
+      if (!isset($data['items'])) break;
+      foreach ($data['items'] as $item) {
+        $track = $item['track'];
+        $trackId = $track['id'];
+        $trackName = $track['name'];
+
+        $this->db->query("INSERT INTO tracks (spotify_id, name) VALUES ($1, $2) ON CONFLICT DO NOTHING;",
+          $trackId, $trackName);
+        $this->db->query("INSERT INTO user_tracks (user_id, track_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;",
+          $userId, $trackId);
+
+        $album = $track['album'];
+        $albumId = $album['id'];
+        $albumName = $album['name'];
+        $albumImage = $album['images'][0]['url'] ?? '';
+  
+        $this->db->query("INSERT INTO albums (spotify_id, name, image_url) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;",
+          $albumId, $albumName, $albumImage);
+
+        $this->db->query("INSERT INTO album_tracks (album_id, track_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;",
+          $albumId, $trackId);
+  
+        foreach ($track['artists'] as $artist) {
+          $artistId = $artist['id'];
+          $artistName = $artist['name'];
+  
+          $this->db->query("INSERT INTO artists (spotify_id, name) VALUES ($1, $2) ON CONFLICT DO NOTHING;",
+            $artistId, $artistName);
+  
+          $this->db->query("INSERT INTO artist_albums (artist_id, album_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;",
+            $artistId, $albumId);
+        }
+      }
+
+      $offset += 50;
+      $hasMore = count($data['items']) === 50;
+    }
+    header("Location: ?command=home");
+    return;
+  }  
 }
