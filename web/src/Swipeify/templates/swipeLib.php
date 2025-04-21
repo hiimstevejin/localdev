@@ -72,11 +72,12 @@
       </div>
     </nav>
 
+    
     <div class="d-flex justify-content-center mt-4">
       <button class="btn btn-success btn-lg">Library</button>
     </div>
 
-    <div class="container d-flex justify-content-center align-items-center min-vh-100 text-center">
+    <div class="container d-flex justify-content-center align-items-center py-5 text-center">
       <div class="d-flex justify-content-between align-items-center w-100" style="max-width: 600px;">
         
         <!-- Left (Keep) -->
@@ -97,10 +98,13 @@
           <img class="trashcan-icon" src="./images/trash-can.svg" alt="Delete" />
           <h5>Delete</h5>
         </div>
-
       </div>
     </div>
-
+    
+    <div class="container mt-5">
+      <h3>Liked Songs</h3>
+      <ul id="liked-songs-list" class="list-group text-start bg-dark"></ul>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/less"></script>
     <script>
@@ -108,19 +112,50 @@
         {
           title: "Blinding Lights",
           artist: "The Weeknd",
-          album_art_url: "https://upload.wikimedia.org/wikipedia/en/0/09/The_Weeknd_-_Blinding_Lights.png"
+          album_art_url: "https://picsum.photos/300?random=1"
         },
         {
           title: "Levitating",
           artist: "Dua Lipa",
-          album_art_url: "https://upload.wikimedia.org/wikipedia/en/6/6e/Dua_Lipa_-_Levitating.png"
+          album_art_url: "https://picsum.photos/300?random=2"
         },
         {
           title: "As It Was",
           artist: "Harry Styles",
-          album_art_url: "https://upload.wikimedia.org/wikipedia/en/9/99/Harry_Styles_-_As_It_Was.png"
+          album_art_url: "https://picsum.photos/300?random=3"
+        },
+        {
+          title: "1989 (Taylor’s Version)",
+          artist: "Taylor Swift",
+          album_art_url: "https://picsum.photos/300?random=4"
+        },
+        {
+          title: "Random Access Memories",
+          artist: "Daft Punk",
+          album_art_url: "https://picsum.photos/300?random=5"
+        },
+        {
+          title: "Divide",
+          artist: "Ed Sheeran",
+          album_art_url: "https://picsum.photos/300?random=6"
+        },
+        {
+          title: "Future Nostalgia",
+          artist: "Dua Lipa",
+          album_art_url: "https://picsum.photos/300?random=7"
+        },
+        {
+          title: "After Hours",
+          artist: "The Weeknd",
+          album_art_url: "https://picsum.photos/300?random=8"
+        },
+        {
+          title: "Fine Line",
+          artist: "Harry Styles",
+          album_art_url: "https://picsum.photos/300?random=9"
         }
       ];
+
     
       const likedSongs = [];
       let songIndex = 0;
@@ -141,6 +176,7 @@
       function swipeLeft() {
         likedSongs.push(songs[songIndex]);
         console.log("KEEP (left):", songs[songIndex]);
+        renderLikedSongs();
         songIndex++;
         displaySong(songIndex);
       }
@@ -151,6 +187,19 @@
         displaySong(songIndex);
       }
     
+      function renderLikedSongs() {
+        const list = document.getElementById("liked-songs-list");
+        list.innerHTML = ""; // Clear existing list
+
+        likedSongs.forEach((song, index) => {
+          const item = document.createElement("li");
+          item.className = "list-group-item bg-secondary text-white d-flex justify-content-between align-items-center";
+          item.innerHTML = `
+            <span>${index + 1}. ${song.title} - ${song.artist}</span>`;
+          list.appendChild(item);
+        });
+      }
+
       function registerSwipeGesture() {
         let touchStartX = 0;
         let touchEndX = 0;
