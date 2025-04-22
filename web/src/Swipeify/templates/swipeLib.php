@@ -110,123 +110,78 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/less"></script>
     <script>
-      const songs = [
-        {
-          title: "Blinding Lights",
-          artist: "The Weeknd",
-          album_art_url: "https://picsum.photos/300?random=1"
-        },
-        {
-          title: "Levitating",
-          artist: "Dua Lipa",
-          album_art_url: "https://picsum.photos/300?random=2"
-        },
-        {
-          title: "As It Was",
-          artist: "Harry Styles",
-          album_art_url: "https://picsum.photos/300?random=3"
-        },
-        {
-          title: "1989 (Taylor’s Version)",
-          artist: "Taylor Swift",
-          album_art_url: "https://picsum.photos/300?random=4"
-        },
-        {
-          title: "Random Access Memories",
-          artist: "Daft Punk",
-          album_art_url: "https://picsum.photos/300?random=5"
-        },
-        {
-          title: "Divide",
-          artist: "Ed Sheeran",
-          album_art_url: "https://picsum.photos/300?random=6"
-        },
-        {
-          title: "Future Nostalgia",
-          artist: "Dua Lipa",
-          album_art_url: "https://picsum.photos/300?random=7"
-        },
-        {
-          title: "After Hours",
-          artist: "The Weeknd",
-          album_art_url: "https://picsum.photos/300?random=8"
-        },
-        {
-          title: "Fine Line",
-          artist: "Harry Styles",
-          album_art_url: "https://picsum.photos/300?random=9"
-        }
-      ];
+  let songs = [];
+  const likedSongs = [];
+  let songIndex = 0;
 
-    
-      const likedSongs = [];
-      let songIndex = 0;
-    
-      function displaySong(index) {
-        if (index >= songs.length) {
-          document.querySelector(".song-container").innerHTML = "<h2>No more songs!</h2>";
-          console.log("Liked Songs:", likedSongs);
-          return;
-        }
-    
-        const song = songs[index];
-        document.getElementById("main-img").src = song.album_art_url;
-        document.getElementById("song-title").textContent = song.title;
-        document.getElementById("song-artist").textContent = song.artist;
-      }
-    
-      function swipeLeft() {
-        likedSongs.push(songs[songIndex]);
-        console.log("KEEP (left):", songs[songIndex]);
-        renderLikedSongs();
-        songIndex++;
-        displaySong(songIndex);
-      }
-    
-      function swipeRight() {
-        console.log("DELETE (right):", songs[songIndex]);
-        songIndex++;
-        displaySong(songIndex);
-      }
-    
-      function renderLikedSongs() {
-        const list = document.getElementById("liked-songs-list");
-        list.innerHTML = ""; // Clear existing list
+  function displaySong(index) {
+    if (index >= songs.length) {
+      document.querySelector(".song-container").innerHTML = "<h2>No more songs!</h2>";
+      console.log("Liked Songs:", likedSongs);
+      return;
+    }
 
-        likedSongs.forEach((song, index) => {
-          const item = document.createElement("li");
-          item.className = "list-group-item bg-secondary text-white d-flex justify-content-between align-items-center";
-          item.innerHTML = `
-            <span>${index + 1}. ${song.title} - ${song.artist}</span>`;
-          list.appendChild(item);
-        });
-      }
+    const song = songs[index];
+    document.getElementById("main-img").src = song.album_art_url;
+    document.getElementById("song-title").textContent = song.title;
+    document.getElementById("song-artist").textContent = song.artist;
+  }
 
-      function registerSwipeGesture() {
-        let touchStartX = 0;
-        let touchEndX = 0;
-    
-        const gestureZone = document.querySelector(".song-container");
-    
-        gestureZone.addEventListener("touchstart", (e) => {
-          touchStartX = e.changedTouches[0].screenX;
-        });
-    
-        gestureZone.addEventListener("touchend", (e) => {
-          touchEndX = e.changedTouches[0].screenX;
-          const delta = touchEndX - touchStartX;
-          if (Math.abs(delta) < 30) return;
-          delta < 0 ? swipeLeft() : swipeRight();
-        });
-      }
-    
-      document.addEventListener("DOMContentLoaded", () => {
-        document.querySelector(".heart-icon").addEventListener("click", swipeLeft);
-        document.querySelector(".trashcan-icon").addEventListener("click", swipeRight);
-        registerSwipeGesture();
-        displaySong(songIndex);
-      });
-    </script>
+  function swipeLeft() {
+    likedSongs.push(songs[songIndex]);
+    renderLikedSongs();
+    songIndex++;
+    displaySong(songIndex);
+  }
+
+  function swipeRight() {
+    songIndex++;
+    displaySong(songIndex);
+  }
+
+  function renderLikedSongs() {
+    const list = document.getElementById("liked-songs-list");
+    list.innerHTML = "";
+    likedSongs.forEach((song, index) => {
+      const item = document.createElement("li");
+      item.className = "list-group-item bg-secondary text-white d-flex justify-content-between align-items-center";
+      item.innerHTML = `<span>${index + 1}. ${song.title} - ${song.artist}</span>`;
+      list.appendChild(item);
+    });
+  }
+
+  function registerSwipeGesture() {
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    const gestureZone = document.querySelector(".song-container");
+
+    gestureZone.addEventListener("touchstart", (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    gestureZone.addEventListener("touchend", (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      const delta = touchEndX - touchStartX;
+      if (Math.abs(delta) < 30) return;
+      delta < 0 ? swipeLeft() : swipeRight();
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      const response = await fetch("index.php?command=songsjson");
+      songs = await response.json();
+      displaySong(songIndex);
+      document.querySelector(".heart-icon").addEventListener("click", swipeLeft);
+      document.querySelector(".trashcan-icon").addEventListener("click", swipeRight);
+      registerSwipeGesture();
+    } catch (error) {
+      console.error("Failed to load songs from server:", error);
+    }
+  });
+</script>
+
     
   </body>
 </html>

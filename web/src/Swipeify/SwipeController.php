@@ -43,6 +43,9 @@ class SwipeController {
       case "callback":
         $this->callback();
         break;
+      case "songsjson":
+        echo $this -> getSongsJSON();
+        break;
       case "home":
         $this->showHome();
         break;
