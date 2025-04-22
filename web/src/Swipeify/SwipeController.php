@@ -186,15 +186,11 @@ class SwipeController {
       echo "Authorization code not found.";
       return;
     }
-  
     $code = $this->input['code'];
-  
     $client_id = Config::$spotify["clientid"];
     $client_secret = Config::$spotify["clientsecret"];
     $redirect_uri = 'http://127.0.0.1:8080/index.php?command=callback';
-  
     $token_url = 'https://accounts.spotify.com/api/token';
-  
     $post_fields = [
       'grant_type' => 'authorization_code',
       'code' => $code,
@@ -204,25 +200,19 @@ class SwipeController {
     ];
   
     $ch = curl_init();
-  
     curl_setopt($ch, CURLOPT_URL, $token_url);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_fields));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
-  
     $response = curl_exec($ch);
     curl_close($ch);
-  
     $data = json_decode($response, true);
-  
     if (isset($data['access_token'])) {
       $_SESSION['spotify_access_token'] = $data['access_token'];
       $_SESSION['spotify_refresh_token'] = $data['refresh_token'];
       $_SESSION['spotify_token_expires'] = time() + $data['expires_in'];
-  
       $this->fetchSpotifyUserProfile($data['access_token']);
-
       header('Location: ?command=home');
       exit();
     } else {
@@ -236,7 +226,6 @@ class SwipeController {
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
       'Authorization: Bearer ' . $accessToken
     ]);
-
     $response = curl_exec($ch);
     curl_close($ch);
 
@@ -245,71 +234,53 @@ class SwipeController {
       $_SESSION['name'] = $user['display_name'];
       $_SESSION['curuserid'] = $user['id'];
       $_SESSION['email'] = $user['email'];
-
       $results = $this->db->query("select * from swipeify_users where email = $1;", $user['email']);
-
       if (empty($results)) {
         $result = $this->db->query("insert into swipeify_users (id, name, email) values ($1, $2, $3);",
         $user['id'], $user['display_name'], $user['email']);
-
         $this->fetchSpotifySongs($_SESSION['spotify_access_token'], $user['id']);
       }
-
-      // header("Location: ?command=home");
-      // return;
     }
   }
 
   private function fetchSpotifySongs($accessToken, $userId) {
     $offset = 0;
     $hasMore = true;
-
     while ($hasMore) {
       $url = "https://api.spotify.com/v1/me/tracks?limit=50&offset=$offset";
-  
       $ch = curl_init($url);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Authorization: Bearer ' . $accessToken
       ]);
-
       $response = curl_exec($ch);
-
       $data = json_decode($response, true);
       if (!isset($data['items'])) break;
       foreach ($data['items'] as $item) {
         $track = $item['track'];
         $trackId = $track['id'];
         $trackName = $track['name'];
-
         $this->db->query("INSERT INTO tracks (spotify_id, name) VALUES ($1, $2) ON CONFLICT DO NOTHING;",
           $trackId, $trackName);
         $this->db->query("INSERT INTO user_tracks (user_id, track_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;",
           $userId, $trackId);
-
-        $album = $track['album'];
-        $albumId = $album['id'];
-        $albumName = $album['name'];
-        $albumImage = $album['images'][0]['url'] ?? '';
-  
+          $album = $track['album'];
+          $albumId = $album['id'];
+          $albumName = $album['name'];
+          $albumImage = $album['images'][0]['url'] ?? '';
         $this->db->query("INSERT INTO albums (spotify_id, name, image_url) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING;",
           $albumId, $albumName, $albumImage);
-
         $this->db->query("INSERT INTO album_tracks (album_id, track_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;",
           $albumId, $trackId);
-  
         foreach ($track['artists'] as $artist) {
           $artistId = $artist['id'];
           $artistName = $artist['name'];
-  
           $this->db->query("INSERT INTO artists (spotify_id, name) VALUES ($1, $2) ON CONFLICT DO NOTHING;",
             $artistId, $artistName);
-  
           $this->db->query("INSERT INTO artist_albums (artist_id, album_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;",
             $artistId, $albumId);
         }
       }
-
       $offset += 50;
       $hasMore = count($data['items']) === 50;
     }

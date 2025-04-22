@@ -58,10 +58,6 @@ $authorize_url = 'https://accounts.spotify.com/authorize?'.http_build_query([
         <div class="collapse navbar-collapse" id="navbarTogglerDemo">
           <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
             <li class="nav-item"><a class="nav-link" href="index.php?command=home">Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="index.php?command=welcome">About</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Services</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Account</a></li>
           </ul>
         </div>
       </nav>
@@ -93,9 +89,7 @@ $authorize_url = 'https://accounts.spotify.com/authorize?'.http_build_query([
         e.preventDefault();
         const query = document.getElementById('searchQuery').value;
         const resultsDiv = document.getElementById('results');
-
         if (!query) return;
-
         fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=album&limit=10`, {
           headers: {
             'Authorization': 'Bearer ' + spotifyAccessToken
@@ -104,7 +98,6 @@ $authorize_url = 'https://accounts.spotify.com/authorize?'.http_build_query([
         .then(response => response.json())
         .then(data => {
           resultsDiv.innerHTML = '';
-
           if (data.albums && data.albums.items.length > 0) {
             resultsDiv.innerHTML += '<h3>Albums</h3>';
             data.albums.items.forEach(album => {
@@ -133,7 +126,6 @@ $authorize_url = 'https://accounts.spotify.com/authorize?'.http_build_query([
           $(this).css('background-color', '');
         });
       </script>
-
 
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

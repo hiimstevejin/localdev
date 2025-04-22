@@ -63,12 +63,8 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
+          <ul class="navbar-nav" style="margin:;">
             <li class="nav-item"><a class="nav-link text-white" href="?command=home">Home</a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="?command=welcome">About</a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="#">Services</a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="#">Contact</a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="#">Account</a></li>
           </ul>
         </div>
       </div>

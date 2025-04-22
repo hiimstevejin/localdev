@@ -34,47 +34,15 @@ $authorize_url = 'https://accounts.spotify.com/authorize?'.http_build_query([
   <?=$message?>
     <div class="container">
       <form action="?command=login" method="post">
+      <h1>Swipeify</h1>
         <div class="mb-3">
         <a href="<?php echo $authorize_url; ?>" class="btn btn-success">
             <img src="https://upload.wikimedia.org/wikipedia/commons/8/84/Spotify_icon.svg" alt="Spotify Logo" width="20" class="me-2">
             Log in with Spotify
           </a>
         </div>
-
-        <div class="mb-3">
-          <label for="fullname" class="form-label">Name</label>
-          <input type="text" class="form-control" id="fullname" name="fullname">
-        </div>
-
-        <div class="mb-3">
-          <label for="email" class="form-label">Email address</label>
-          <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp">
-        </div>
-
-        <div class="mb-3">
-          <label for="password" class="form-label">Password</label>
-          <input type="password" class="form-control" id="password" name="password">
-        </div>
-
-        <div class="mb-3 form-check">
-          <input type="checkbox" class="form-check-input" id="check">
-          <label class="form-check-label" for="check">Show Password</label>
-        </div>
-        <div>
-          <button type="submit" class="btn btn-success">Submit</button>
-        </div>
       </form>
     </div>
-    <script>
-          document.getElementById("check").addEventListener("change", function() {
-        var passwordField = document.getElementById("password");
-        if (this.checked) {
-          passwordField.type = "text"; // Show password
-        } else {
-          passwordField.type = "password"; // Hide password
-        }
-      });
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/less" ></script>
   </body>

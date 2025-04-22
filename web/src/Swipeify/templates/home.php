@@ -23,8 +23,6 @@
         <div class="collapse navbar-collapse" id="navbarTogglerDemo">
           <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
             <li class="nav-item"><a class="nav-link" href="index.php?command=home">Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="index.php?command=welcome">About</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
             <li class="nav-item"><a class="nav-link" href="index.php?command=logout">Log Out</a></li>
             <li class="nav-item"><a class="btn btn-light" href="index.php?command=sync">Sync Library<img class="img-responsive center-block" src="images/refresh.png" alt="Refresh Icon" style="margin-left: 10px; height: 25px;"></a></li>
           </ul>
@@ -41,8 +39,8 @@
           <p class="btn-bottom-p" style="font-size: 12px; margin-bottom: 5px;">Swipe from your library</p>
         </a><br>
         <a class="btn btn-warning" href="index.php?command=search" style="border-radius: 20px; margin-top: 20px;">
-          <p class="btn-top-p" style="font-size: 40px; font-weight: 800; margin-bottom: 0px;">Playlist/Album</p>
-          <p class="btn-bottom-p" style="font-size: 12px; margin-bottom: 5px;">Swipe from other's playlists/albums</p>
+          <p class="btn-top-p" style="font-size: 40px; font-weight: 800; margin-bottom: 0px;">Albums</p>
+          <p class="btn-bottom-p" style="font-size: 12px; margin-bottom: 5px;">Search for Albums</p>
         </a>
       </section>
 
