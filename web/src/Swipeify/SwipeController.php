@@ -30,7 +30,6 @@ class SwipeController {
       $this->input["command"] == "login" || 
       $this->input["command"] == "showlogin" ||
       $this->input["command"] == "callback" ||
-      $this->input["command"] == "home" ||
       isset($_SESSION["name"])))
       $command = $this->input["command"];
 
@@ -115,6 +114,38 @@ class SwipeController {
     }
     return $results;
   }
+
+  public function getSongsJSON() {
+    header('Content-Type: application/json');
+    $results = $this->db->query("
+      SELECT
+        tracks.spotify_id AS song_id,
+        tracks.name AS song_name,
+        albums.name AS album_name,
+        albums.image_url AS album_art_url,
+        array_agg(DISTINCT artists.name) AS artist_names
+      FROM user_tracks
+      JOIN tracks ON user_tracks.track_id = tracks.spotify_id
+      JOIN album_tracks ON tracks.spotify_id = album_tracks.track_id
+      JOIN albums ON album_tracks.album_id = albums.spotify_id
+      JOIN artist_albums ON albums.spotify_id = artist_albums.album_id
+      JOIN artists ON artist_albums.artist_id = artists.spotify_id
+      WHERE user_tracks.user_id = $1
+      GROUP BY tracks.spotify_id, tracks.name, albums.name, albums.image_url
+    ", $_SESSION['curuserid']);
+    $songs = [];
+    foreach ($results as $row) {
+      $artists = is_string($row["artist_names"]) ? str_getcsv(trim($row["artist_names"], '{}')) : (is_array($row["artist_names"]) ? $row["artist_names"] : []);
+      $songs[] = [
+        "title" => $row["song_name"],
+        "artist" => implode(", ", $artists),
+        "album_art_url" => $row["album_art_url"],
+        "user_id" => $_SESSION['curuserid'],
+        "song_id" => $row["song_id"]
+      ];
+    }
+    return json_encode($songs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+  }  
 
   public function getSearch($message = "") {
     include("/opt/src/Swipeify/templates/swipeLib.html");
