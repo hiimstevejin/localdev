@@ -1,3 +1,16 @@
+<?php
+include_once __DIR__ . '/../Config.php';
+$client_id = Config::$spotify["clientid"];
+$redirect_uri = 'http://127.0.0.1:8080/index.php?command=callback';
+$scope = 'user-read-private user-read-email user-library-read';
+
+$authorize_url = 'https://accounts.spotify.com/authorize?'.http_build_query([
+    'response_type' => 'code',
+    'client_id' => $client_id,
+    'scope' => $scope,
+    'redirect_uri' => $redirect_uri
+]);
+?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -20,6 +33,10 @@
 
     <link rel="stylesheet/less" type="text/css" href="./styles/custom.less">
     <script src="https://cdn.jsdelivr.net/npm/less"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      const spotifyAccessToken = "<?= $_SESSION['spotify_access_token'] ?>";
+    </script>
   </head>
 
   <body style="min-height: 100vh; display: flex; flex-direction: column;">
@@ -55,19 +72,68 @@
         <h1 style="margin-left: auto; margin-right: auto;">Search for Album/Playlist</h1>
       </section>
 
-      <form class="form-inline my-2 my-lg-0" action="?command=searching" method="GET">
+      <form id="searchForm" class="form-inline my-2 my-lg-0">
         <div style="margin-left: auto; margin-right: auto;">
-            <input class="form-control mr-sm-2" type="search" name="query" placeholder="Search" aria-label="Search" style="width: 400px;">
-            <button type="submit" class="btn" style="background-color: white;">
-                <img class="img-responsive center-block" src="images/search.png" alt="Magnifying Glass" style="height: 20px;">
-            </button>
+          <input id="searchQuery" class="form-control mr-sm-2" type="search" name="query" placeholder="Search" aria-label="Search" style="width: 400px;">
+          <button type="submit" class="btn" style="background-color: white;">
+            <img class="img-responsive center-block" src="images/search.png" alt="Magnifying Glass" style="height: 20px;">
+          </button>
         </div>
-    </form>
-    </main>
+      </form>
 
+    <div id="results" style="padding: 20px;"></div>
+
+    </main>
     <footer class="bg-dark text-white text-center py-3">
       <p>&copy; 2025 SJ3SJ. All rights reserved.</p>
     </footer>
+
+    <script>
+      document.getElementById('searchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const query = document.getElementById('searchQuery').value;
+        const resultsDiv = document.getElementById('results');
+
+        if (!query) return;
+
+        fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=album&limit=10`, {
+          headers: {
+            'Authorization': 'Bearer ' + spotifyAccessToken
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          resultsDiv.innerHTML = '';
+
+          if (data.albums && data.albums.items.length > 0) {
+            resultsDiv.innerHTML += '<h3>Albums</h3>';
+            data.albums.items.forEach(album => {
+              resultsDiv.innerHTML += `
+                <div class="result-item" style="margin: 10px 0; padding: 10px; border-radius: 5px;">
+                  <img src="${album.images[0]?.url}" alt="${album.name}" style="height: 50px;">
+                  <strong>${album.name}</strong> by ${album.artists.map(a => a.name).join(', ')}
+                </div>`;
+            });
+          }
+
+          if (!data.albums.items.length) {
+            resultsDiv.innerHTML = '<p>No results found.</p>';
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          resultsDiv.innerHTML = '<p>Error fetching results.</p>';
+        });
+      });
+      </script>
+      <script>
+        $(document).on('mouseenter', '.result-item', function() {
+          $(this).css('background-color', '#f0f0f0');
+        }).on('mouseleave', '.result-item', function() {
+          $(this).css('background-color', '');
+        });
+      </script>
+
 
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
