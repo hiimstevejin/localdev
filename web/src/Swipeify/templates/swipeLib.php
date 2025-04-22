@@ -107,6 +107,7 @@
       <h3>Liked Songs</h3>
       <ul id="liked-songs-list" class="list-group text-start bg-dark"></ul>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/less"></script>
     <script>
@@ -168,18 +169,18 @@
     });
   }
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    try {
-      const response = await fetch("index.php?command=songsjson");
-      songs = await response.json();
-      displaySong(songIndex);
-      document.querySelector(".heart-icon").addEventListener("click", swipeLeft);
-      document.querySelector(".trashcan-icon").addEventListener("click", swipeRight);
-      registerSwipeGesture();
-    } catch (error) {
-      console.error("Failed to load songs from server:", error);
-    }
-  });
+  $(document).ready(async function () {
+  try {
+    const response = await fetch("index.php?command=songsjson");
+    songs = await response.json();
+    displaySong(songIndex);
+    $(".heart-icon").on("click", swipeLeft);
+    $(".trashcan-icon").on("click", swipeRight);
+    registerSwipeGesture();
+  } catch (error) {
+    console.error("Failed to load songs from server:", error);
+  }
+});
 </script>
 
     
