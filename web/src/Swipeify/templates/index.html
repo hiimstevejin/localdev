@@ -21,6 +21,13 @@
       integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
       crossorigin="anonymous"
     />
+    <style>
+      .hover-glow {
+        box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.3);
+        transition: box-shadow 0.3s ease-in-out, transform 0.2s ease-in-out;
+        transform: scale(1.03);
+      }
+    </style>
 
     <link rel="stylesheet/less" type="text/css" href="styles/custom.less" />
     <!-- <link rel="stylesheet/less" type="text/css" href="./styles/custom.less" > -->
@@ -260,6 +267,24 @@
     <script>
       document.addEventListener("DOMContentLoaded", () => {
 
+        tableBody.innerHTML = "";
+          rows.forEach(row => tableBody.appendChild(row));
+        });
+
+        const cards = document.querySelectorAll(".card");
+        cards.forEach(card => {
+          card.addEventListener("mouseenter", () => {
+            card.classList.add("hover-glow");
+          });
+          card.addEventListener("mouseleave", () => {
+            card.classList.remove("hover-glow");
+          });
+        });
+
+        const tableBody = document.getElementById("songs-table-body");
+        const sortSelect = document.getElementById("sort-select");
+
+        sortSelect.addEventListener("change", () => {
         document
           .querySelector("#newsletter-form")
           .addEventListener("submit", (e) => {
