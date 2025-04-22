@@ -12,12 +12,7 @@ class SwipeController {
   public function __construct($input) {
     // Start the session!
     session_start();
-    if (isset($_COOKIE["user_name"])) {
-        $_SESSION["name"] = $_COOKIE["user_name"]; // Restore session from cookie
-    }
-    
     $this->db = new Database();
-
     $this->input = $input;
   }
 
@@ -44,6 +39,7 @@ class SwipeController {
         break;
       case "sync":
         $this->fetchSpotifySongs($_SESSION['spotify_access_token'], $_SESSION['curuserid']);
+        break;
       case "callback":
         $this->callback();
         break;
@@ -98,20 +94,58 @@ class SwipeController {
     if ($result) {
       $_SESSION["curuserid"] = $result[0]["id"];
     }
-    $results = $this->db->query("SELECT 
-        tracks.name AS song_name, 
-        artists.name AS artist_name, 
-        albums.name AS album_name,
-        albums.image_url AS image_url
+    $results = $this->db->query("SELECT
+      tracks.name AS song_name,
+      albums.name AS album_name,
+      albums.image_url AS image_url,
+      array_agg(DISTINCT artists.name) AS artist_names
     FROM user_tracks
     JOIN tracks ON user_tracks.track_id = tracks.spotify_id
     JOIN album_tracks ON tracks.spotify_id = album_tracks.track_id
     JOIN albums ON album_tracks.album_id = albums.spotify_id
     JOIN artist_albums ON albums.spotify_id = artist_albums.album_id
     JOIN artists ON artist_albums.artist_id = artists.spotify_id
-    WHERE user_tracks.user_id = $1;", $_SESSION["curuserid"]);  
+    WHERE user_tracks.user_id = $1
+    GROUP BY tracks.spotify_id, tracks.name, albums.name, albums.spotify_id", $_SESSION["curuserid"]);
+    foreach ($results as &$row) {
+      if (isset($row["artist_names"]) && is_string($row["artist_names"])) {
+        $row["artist_names"] = str_getcsv(trim($row["artist_names"], '{}'));
+      }
+    }
     return $results;
   }
+
+  public function getSongsJSON() {
+    header('Content-Type: application/json');
+    $results = $this->db->query("
+      SELECT
+        tracks.spotify_id AS song_id,
+        tracks.name AS song_name,
+        albums.name AS album_name,
+        albums.image_url AS album_art_url,
+        array_agg(DISTINCT artists.name) AS artist_names
+      FROM user_tracks
+      JOIN tracks ON user_tracks.track_id = tracks.spotify_id
+      JOIN album_tracks ON tracks.spotify_id = album_tracks.track_id
+      JOIN albums ON album_tracks.album_id = albums.spotify_id
+      JOIN artist_albums ON albums.spotify_id = artist_albums.album_id
+      JOIN artists ON artist_albums.artist_id = artists.spotify_id
+      WHERE user_tracks.user_id = $1
+      GROUP BY tracks.spotify_id, tracks.name, albums.name, albums.image_url
+    ", $_SESSION['curuserid']);
+    $songs = [];
+    foreach ($results as $row) {
+      $artists = is_string($row["artist_names"]) ? str_getcsv(trim($row["artist_names"], '{}')) : (is_array($row["artist_names"]) ? $row["artist_names"] : []);
+      $songs[] = [
+        "title" => $row["song_name"],
+        "artist" => implode(", ", $artists),
+        "album_art_url" => $row["album_art_url"],
+        "user_id" => $_SESSION['curuserid'],
+        "song_id" => $row["song_id"]
+      ];
+    }
+    return json_encode($songs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+  }  
 
   public function getSearch($message = "") {
     include("/opt/src/Swipeify/templates/swipeLib.html");
@@ -187,7 +221,7 @@ class SwipeController {
       $this->fetchSpotifyUserProfile($data['access_token']);
 
       header('Location: ?command=home');
-      return;
+      exit();
     } else {
       echo "Error retrieving access token:<br><pre>" . print_r($data, true) . "</pre>";
     }
@@ -218,8 +252,8 @@ class SwipeController {
         $this->fetchSpotifySongs($_SESSION['spotify_access_token'], $user['id']);
       }
 
-      header("Location: ?command=home");
-      return;
+      // header("Location: ?command=home");
+      // return;
     }
   }
 

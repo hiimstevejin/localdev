@@ -79,7 +79,14 @@
               <?php foreach ($songs as $song): ?>
                 <tr>
                   <td><?php echo htmlspecialchars($song['song_name']); ?></td>
-                  <td><?php echo htmlspecialchars($song['artist_name']); ?></td>
+                  <td><?php
+                        $artistNames = $song["artist_names"] ?? [];
+                        if (is_array($artistNames)) {
+                          echo htmlspecialchars(implode(", ", $artistNames));
+                        } else {
+                          echo $artistNames;
+                        }
+                        ?></td>
                   <td><?php echo htmlspecialchars($song['album_name']); ?></td>
                 </tr>
               <?php endforeach; ?>
