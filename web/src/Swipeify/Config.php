@@ -1,17 +1,17 @@
 <?php
 class Config {
     public static $db = [
-        // "host" => "localhost",
-        // "port" => 5432,
-        // "user" => "rze7ud",
-        // "pass" => "Gc-Mys2-QKHm",
-        // "database" => "rze7ud",
-
-        "host" => "db",
+        "host" => "localhost",
         "port" => 5432,
-        "user" => "localuser",
-        "pass" => "cs4640LocalUser!",
-        "database" => "example"
+        "user" => "rze7ud",
+        "pass" => "Gc-Mys2-QKHm",
+        "database" => "rze7ud",
+
+        // "host" => "db",
+        // "port" => 5432,
+        // "user" => "localuser",
+        // "pass" => "cs4640LocalUser!",
+        // "database" => "example"
     ];
     public static $spotify = [
         "clientid" => "3c5cb373f9824194aa64d450a3e6ec37",

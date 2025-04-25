@@ -1,6 +1,6 @@
 <?php
 
-// 
+// https://cs4640.cs.virginia.edu/rze7ud/Swipeify/index.php?command=home
 
 // DEBUGGING ONLY! Show all errors.
 error_reporting(E_ALL);
@@ -10,8 +10,8 @@ ini_set("display_errors", 1);
 // that Apache does not serve publicly.  They will be in /opt/src/, which
 // is our src/ directory in Docker.
 spl_autoload_register(function ($classname) {
-        include "/opt/src/Swipeify/$classname.php";
-        // include "/students/rze7ud/students/rze7ud/private/Swipeify/$classname.php";
+        // include "/opt/src/Swipeify/$classname.php";
+        include "/students/rze7ud/students/rze7ud/private/Swipeify/$classname.php";
 });
 
 // Instantiate the front controller

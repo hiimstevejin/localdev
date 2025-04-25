@@ -147,38 +147,38 @@ class SwipeController {
         "song_id" => $row["song_id"]
       ];
     }
-    return json_encode($songs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    return json_encode($songs, flags: JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
   }  
 
   public function getSearch($message = "") {
-    include("/opt/src/Swipeify/templates/swipeLib.html");
-    // include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/search.html");
+    // include("/opt/src/Swipeify/templates/swipeLib.html");
+    include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/swipeLib.html");
   }
 
   public function showSwipeLib($message = "") {
-    include("/opt/src/Swipeify/templates/swipeLib.php");
-    // include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/swipeLib.html");
+    // include("/opt/src/Swipeify/templates/swipeLib.php");
+    include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/swipeLib.php");
   }
   public function showSearch($message = "") {
-    include("/opt/src/Swipeify/templates/search.php");
-    // include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/search.php");
+    // include("/opt/src/Swipeify/templates/search.php");
+    include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/search.php");
   }
 
   public function showHome($message = "") {
     $songs = $this->getSongs();
-    include("/opt/src/Swipeify/templates/home.php");
-    // include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/home.php");
+    //include("/opt/src/Swipeify/templates/home.php");
+    include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/home.php");
     // echo json_encode($songs);
   }
 
   public function showLogin($message = "") {
-    include("/opt/src/Swipeify/templates/login.php");
-    // include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/login.php");
+    // include("/opt/src/Swipeify/templates/login.php");
+    include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/login.php");
   }
   
   public function showWelcome($message = "") {
-    include("/opt/src/Swipeify/templates/index.html");
-    // include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/index.html");
+    // include("/opt/src/Swipeify/templates/index.html");
+    include("/students/rze7ud/students/rze7ud/private/Swipeify/templates/index.html");
   }
 
   public function callback($message = "") {
@@ -189,7 +189,8 @@ class SwipeController {
     $code = $this->input['code'];
     $client_id = Config::$spotify["clientid"];
     $client_secret = Config::$spotify["clientsecret"];
-    $redirect_uri = 'http://127.0.0.1:8080/index.php?command=callback';
+    $redirect_uri = 'https://cs4640.cs.virginia.edu/rze7ud/Swipeify/index.php?command=callback';
+    // $redirect_uri = '127.0.0.1:8080/index.php?command=callback';
     $token_url = 'https://accounts.spotify.com/api/token';
     $post_fields = [
       'grant_type' => 'authorization_code',
