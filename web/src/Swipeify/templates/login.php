@@ -1,7 +1,8 @@
 <?php
 include_once __DIR__ . '/../Config.php';
 $client_id = Config::$spotify["clientid"];
-$redirect_uri = 'http://127.0.0.1:8080/index.php?command=callback';
+// $redirect_uri = 'http://127.0.0.1:8080/index.php?command=callback';
+$redirect_uri = 'https://cs4640.cs.virginia.edu/rze7ud/Swipeify/index.php?command=callback';
 $scope = 'user-read-private user-read-email user-library-read';
 
 $authorize_url = 'https://accounts.spotify.com/authorize?'.http_build_query([

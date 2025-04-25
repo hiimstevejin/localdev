@@ -21,9 +21,9 @@ class Database {
         $password = Config::$db["pass"];
         $port = Config::$db["port"];
 
-        // $this->dbConnector = pg_connect("host=$host port=$port dbname=$database user=$user password=$password"); 
+        $this->dbConnector = pg_connect("host=$host port=$port dbname=$database user=$user password=$password"); 
 
-        $this -> dbConnector = pg_connect("host=db port=5432 dbname=example user=localuser password=cs4640LocalUser!");
+        // $this -> dbConnector = pg_connect("host=db port=5432 dbname=example user=localuser password=cs4640LocalUser!");
     }
 
     /**
